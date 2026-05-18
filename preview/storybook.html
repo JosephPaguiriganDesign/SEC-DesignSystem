@@ -924,6 +924,9 @@ function TextField({ label, placeholder, value, helper, error, type = 'text', ic
 /* ----- Radio ----------------------------------------------- */
 function Radio({ name, options = [], value: v0, onChange, disabled }) {
   const [v, setV] = useState(v0 || (options[0] && options[0].value));
+  // Selected state uses textLinkDeep (#0e58a0, 7.19:1 on white — AAA) to
+  // match the canonical Checkbox affordance. Same blue, same posture.
+  const selectedColor = T.color.textLinkDeep;
   return (
     <div role="radiogroup" style={{ display: 'flex', flexDirection: 'column', gap: 10, fontFamily: T.font.family }}>
       {options.map((o) => {
@@ -932,11 +935,11 @@ function Radio({ name, options = [], value: v0, onChange, disabled }) {
           <label key={o.value} style={{ display: 'inline-flex', alignItems: 'center', gap: 10, cursor: disabled ? 'not-allowed' : 'pointer', opacity: disabled ? 0.5 : 1 }}>
             <span style={{
               width: 20, height: 20, borderRadius: T.radius.pill,
-              border: `${T.border.md}px solid ${checked ? T.color.green : T.color.border}`,
+              border: `${T.border.md}px solid ${checked ? selectedColor : T.color.border}`,
               background: T.color.white, display: 'grid', placeItems: 'center', flexShrink: 0,
               transition: `border-color ${T.motion.fast}ms`,
             }} onClick={() => { if (!disabled) { setV(o.value); onChange && onChange(o.value); } }}>
-              {checked && <span style={{ width: 10, height: 10, borderRadius: T.radius.pill, background: T.color.green }} />}
+              {checked && <span style={{ width: 10, height: 10, borderRadius: T.radius.pill, background: selectedColor }} />}
             </span>
             <span style={{ fontSize: T.type.body.size, color: T.color.text }}>{o.label}</span>
           </label>
@@ -1252,57 +1255,6 @@ function Dropdown({ label, placeholder = 'Select', options = [], value: v0, help
   );
 }
 
-/* ----- Card Container (C45) --------------------------------------------
- * Canonical SCE card. White surface with a 1 px gray hairline border,
- * 16 px corner radius, soft card shadow. Optional left-accent bar (any
- * T.color or hex) flags categorical meaning — yellow for promotional,
- * green for success/savings, red for outage, etc.
- *
- * Props:
- *   eyebrow   optional uppercase overline above the title
- *   title     card heading (required)
- *   body      card body copy (required)
- *   footer    optional footer slot (link, button, badge, etc.)
- *   accent    optional left-edge accent color
- *   viewport  'desktop' | 'mobile' — drives type and padding scale
- * --------------------------------------------------------------------- */
-function Card({ eyebrow, title, body, footer, accent, viewport = 'desktop' }) {
-  const isMob = viewport === 'mobile';
-  const pad   = isMob ? 20 : 24;
-  return (
-    <div style={{
-      background: T.color.white, border: `1px solid ${T.color.border}`,
-      borderRadius: T.radius.md, padding: pad, boxShadow: T.shadow.card,
-      borderLeft: accent ? `4px solid ${accent}` : `1px solid ${T.color.border}`,
-      fontFamily: T.font.family,
-    }}>
-      {eyebrow && (
-        <div style={{
-          ...typeStyle('captionBold', viewport),
-          letterSpacing: '0.1em', textTransform: 'uppercase',
-          color: T.color.textMuted, marginBottom: 8,
-        }}>{eyebrow}</div>
-      )}
-      <h4 style={{
-        margin: 0,
-        ...typeStyle('h6', viewport),
-        color: T.color.text, letterSpacing: '-0.01em',
-        marginBottom: 8,
-      }}>{title}</h4>
-      <div style={{
-        ...typeStyle('body', viewport),
-        color: T.color.textMuted,
-        marginBottom: footer ? 16 : 0,
-      }}>{body}</div>
-      {footer && (
-        <div style={{
-          paddingTop: 16,
-          borderTop: `1px solid ${T.color.borderSoft}`,
-        }}>{footer}</div>
-      )}
-    </div>
-  );
-}
 
 /* ----- Alert ----------------------------------------------- */
 function Alert({ tone = 'info', title, children }) {
@@ -1435,7 +1387,10 @@ function Checkbox({ label, checked: c, onChange, disabled }) {
   );
 }
 
-/* ----- Toggle ---------------------------------------------- */
+/* ----- Toggle ----------------------------------------------
+ * On-state track uses textLinkDeep (#0e58a0, AAA on white) to match the
+ * canonical Checkbox / Radio affordance — one blue across all selected
+ * form controls instead of mixing green + blue. */
 function Toggle({ label, checked: c, onChange, disabled }) {
   const [on, setOn] = useState(!!c);
   const flip = () => { if (disabled) return; const v = !on; setOn(v); onChange && onChange(v); };
@@ -1447,7 +1402,7 @@ function Toggle({ label, checked: c, onChange, disabled }) {
     }}>
       <span onClick={flip} style={{
         width: 40, height: 22, borderRadius: T.radius.pill, position: 'relative',
-        background: on ? T.color.green : T.color.lightGray,
+        background: on ? T.color.textLinkDeep : T.color.lightGray,
         transition: `background ${T.motion.base}ms ${T.motion.easing}`,
       }}>
         <span style={{
@@ -2020,43 +1975,6 @@ function SyndicatedTipBlock({
   );
 }
 
-/* ----- ProgramCard (named SCE program tile) --------------- */
-function ProgramCard({
-  eyebrow = 'Save energy',
-  title = 'Time-of-Use rates',
-  description = 'Lower your bill by shifting usage to off-peak hours.',
-  saving = '8 to 12% typical savings',
-  Icon = IconLeaf,
-}) {
-  return (
-    <div style={{
-      background: T.color.white, border: `1px solid ${T.color.border}`,
-      borderRadius: T.radius.md, padding: 20,
-      fontFamily: T.font.family, boxShadow: T.shadow.card,
-      display: 'flex', flexDirection: 'column', gap: 12,
-    }}>
-      <div style={{
-        width: 44, height: 44, borderRadius: T.radius.pill,
-        background: T.color.greenSoft, color: T.color.green,
-        display: 'grid', placeItems: 'center',
-      }}>
-        <Icon width={22} height={22} strokeWidth={2} />
-      </div>
-      <div>
-        <div style={{ fontSize: T.type.overline.size, fontWeight: 700, color: T.color.green, textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: 4 }}>{eyebrow}</div>
-        <div style={{ fontSize: T.type.h4.size, fontWeight: T.type.h4.weight, color: T.color.text, marginBottom: 6 }}>{title}</div>
-        <div style={{ fontSize: T.type.caption.size, color: T.color.textMuted, lineHeight: 1.55 }}>{description}</div>
-      </div>
-      <div style={{
-        marginTop: 'auto', padding: '8px 12px',
-        background: T.color.yellowSoft, color: T.color.text,
-        borderRadius: T.radius.sm, fontSize: T.type.overline.size,
-        fontWeight: T.font.weight.bold, alignSelf: 'flex-start',
-        textTransform: 'uppercase', letterSpacing: '0.08em',
-      }}>{saving}</div>
-    </div>
-  );
-}
 
 /* ----- Modal (lightweight) --------------------------------- */
 function Modal({ open, onClose, title, children, footer }) {
@@ -4213,29 +4131,6 @@ function HomepageHeroCard({
   );
 }
 
-/* ----- AuthenticatedBadge (signed-in indicator) ------------ */
-function AuthenticatedBadge({ name = 'Joseph P.', accountId = '0000-0000-4421' }) {
-  return (
-    <div style={{
-      display: 'inline-flex', alignItems: 'center', gap: 10,
-      background: T.color.greenSoft, border: `1px solid ${T.color.green}`,
-      borderRadius: T.radius.pill, padding: '6px 14px 6px 6px',
-      fontFamily: T.font.family,
-    }}>
-      <div style={{
-        width: 28, height: 28, borderRadius: T.radius.pill,
-        background: T.color.green, color: T.color.yellow,
-        display: 'grid', placeItems: 'center',
-      }}>
-        <IconCheck width={16} height={16} strokeWidth={2.5} />
-      </div>
-      <div style={{ display: 'flex', flexDirection: 'column' }}>
-        <div style={{ fontSize: T.type.caption.size, fontWeight: T.font.weight.bold, color: T.color.green, lineHeight: 1.1 }}>Signed in as {name}</div>
-        <div style={{ fontSize: 10, color: T.color.textMuted, fontFamily: 'ui-monospace, SFMono-Regular, Menlo, monospace' }}>{accountId}</div>
-      </div>
-    </div>
-  );
-}
 
 /* ----- EdisonBrand (canonical brand mark + wordmark) ------- */
 /* Canonical starburst SVG path from ~/Documents/Claude/Projects/SCE Project/
@@ -6123,38 +6018,6 @@ function SocialRow() {
   );
 }
 
-/* ----- BillSummary ----------------------------------------- */
-function BillSummary({ amount = 142.38, due = 'May 18, 2026' }) {
-  const p = useReveal(T.motion.reveal);
-  return (
-    <div style={{
-      transform: `translateY(${(1 - p) * 8}px)`, opacity: p,
-      background: T.color.white, borderRadius: T.radius.md,
-      border: `1px solid ${T.color.border}`, padding: 24,
-      fontFamily: T.font.family, boxShadow: T.shadow.card,
-    }}>
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 4 }}>
-        <span style={{ fontSize: T.type.overline.size, color: T.color.textMuted, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.1em' }}>
-          Current bill
-        </span>
-        <span style={{
-          background: T.color.successSoft, color: '#0d4a1f',
-          fontSize: 11, fontWeight: 700, padding: '3px 8px', borderRadius: T.radius.pill,
-        }}>On track</span>
-      </div>
-      <div style={{ display: 'flex', alignItems: 'baseline', gap: 6, margin: '4px 0 8px' }}>
-        <span style={{ fontSize: T.size['2xlPlus'], fontWeight: 800, color: T.color.text, letterSpacing: '-0.02em' }}>${amount.toFixed(2)}</span>
-      </div>
-      <div style={{ fontSize: T.type.caption.size, color: T.color.textMuted, marginBottom: 18 }}>
-        Due {due}
-      </div>
-      <div style={{ display: 'flex', gap: 8 }}>
-        <Button variant="primary" size="md" icon={IconDollar}>Pay bill</Button>
-        <Button variant="secondary" size="md">View details</Button>
-      </div>
-    </div>
-  );
-}
 
 /* ----- HeroBanner (full-bleed photo + navy gradient overlay) */
 function HeroBanner({
@@ -7611,12 +7474,6 @@ const SECTIONS = [
           description="Top-down gradient card — title + byline top-left, launch icon top-right."
           canonicalAlternative={{ id: 'featured-card', label: 'Content Card (C24, 24A, 24B) — canonical' }} />,
       },
-      {
-        id: 'imp-cards-c08', title: 'C08 Quick Actions Bar', meta: 'imported · navigation',
-        render: () => <LegacyStory storyId="cards-c08" badge="Navigation" title="C08 Quick Actions Bar"
-          description="Quick action shortcut bar that pins below the global header for authenticated users."
-          canonicalAlternative={{ id: 'quick-actions-bar', label: 'Quick Actions Bar (C08) — canonical' }} />,
-      },
       // ─── Alert variants ──────────────────────────────────────
       {
         id: 'imp-alert-variants', title: 'All Alert Variants', meta: 'imported · alerts',
@@ -8626,450 +8483,6 @@ import { Type } from '@sce/design-system';
     items: [
       // (Removed) Button (C03) — superseded by the canonical
       // `Buttons — Variants` imported story under Inputs & Buttons.
-      {
-        id: 'card', title: 'Card Container (C45)', meta: 'component canonical',
-        render: () => {
-          const SectionTitle = ({ children, mt = 40 }) => (
-            <h3 style={{
-              margin: `${mt}px 0 8px`, fontSize: 22, fontWeight: 700,
-              color: T.color.text, letterSpacing: '-0.01em',
-              fontFamily: T.font.family,
-            }}>{children}</h3>
-          );
-          const Lead = ({ children, max = 760 }) => (
-            <p style={{
-              margin: '0 0 12px', maxWidth: max,
-              ...typeStyle('caption', 'desktop'), color: T.color.textMuted,
-              fontFamily: T.font.family,
-            }}>{children}</p>
-          );
-          const SubLabel = ({ children, mt = 24 }) => (
-            <div style={{
-              marginTop: mt, marginBottom: 12,
-              fontSize: 12, fontWeight: 700, lineHeight: '16px',
-              color: T.color.textMuted, textTransform: 'uppercase',
-              letterSpacing: '0.1em', fontFamily: T.font.family,
-            }}>{children}</div>
-          );
-          const Panel = ({ children, pad = 24, bg = T.color.heather }) => (
-            <div style={{
-              padding: pad, background: bg,
-              border: `1px solid ${T.color.border}`,
-              borderRadius: T.radius.md, color: T.color.text,
-            }}>{children}</div>
-          );
-          const NumberBadge = ({ n }) => (
-            <span style={{
-              display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
-              width: 22, height: 22, borderRadius: '50%',
-              background: T.color.yellow, color: T.color.text,
-              fontSize: 12, fontWeight: 800, fontFamily: T.font.family,
-              flexShrink: 0,
-            }}>{n}</span>
-          );
-
-          /* Playground state */
-          const [pgViewport, setPgViewport] = useState('desktop');
-          const [pgEyebrow, setPgEyebrow]   = useState(true);
-          const [pgAccent,  setPgAccent]    = useState('yellow');
-          const [pgFooter,  setPgFooter]    = useState(true);
-          const [pgTitle,   setPgTitle]     = useState('Save with time-of-use rates');
-          const [pgBody,    setPgBody]      = useState('Earn credits by shifting energy use to off-peak hours. Most homes save 8 to 12 percent in the first year.');
-
-          const ACCENTS = {
-            none:   null,
-            yellow: T.color.yellow,
-            green:  T.color.green,
-            red:    T.color.error,
-            blue:   T.color.textLink,
-          };
-
-          return (
-            <div style={{ fontFamily: T.font.family, color: T.color.text }}>
-              {/* ---- Intro ---- */}
-              <SectionTitle mt={0}>Card Container</SectionTitle>
-              <Lead>
-                The canonical SCE card surface. A white panel with a 1 px gray hairline edge, 16 px corner radius, and a soft card shadow. Carries a content hierarchy of <strong>eyebrow → title → body → optional footer</strong>, plus an optional left-edge accent bar that flags categorical meaning (yellow for promotional, green for savings, red for outages, blue for navigational). Cards compose into grids, sidebar columns, and modular dashboards across sce.com.
-              </Lead>
-
-              {/* ---- Anatomy ---- */}
-              <SectionTitle>Anatomy</SectionTitle>
-              <Lead>Four content regions stacked vertically, plus an optional left-edge accent bar.</Lead>
-              <Panel bg={T.color.bgPrimary} pad={24}>
-                <div style={{
-                  display: 'grid',
-                  gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))',
-                  gap: 12, marginBottom: 20,
-                }}>
-                  {[
-                    { n: 1, k: 'Accent (optional)', d: '4 px left-edge bar. Color signals category — yellow promotional, green savings, red outage, blue navigation.' },
-                    { n: 2, k: 'Eyebrow (optional)', d: 'Caption Bold (14/20/600 desktop, 12/18/600 mobile) UPPERCASE in textMuted. Sets context above the title.' },
-                    { n: 3, k: 'Title',             d: 'Headline 6 (24/32/700 desktop, 20/28/700 mobile) in T.color.text. One sentence; verb-leading where possible.' },
-                    { n: 4, k: 'Body',              d: 'Body Desktop (16/24/400) / Body Mobile (14/22/400) in textMuted. Supporting paragraph — keep tight.' },
-                    { n: 5, k: 'Footer (optional)', d: 'Hairline-separated slot for a text link, button, or status pill.' },
-                  ].map((r) => (
-                    <div key={r.n} style={{
-                      background: T.color.white, padding: 14,
-                      border: `1px solid ${T.color.border}`,
-                      borderRadius: T.radius.sm,
-                    }}>
-                      <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 6 }}>
-                        <NumberBadge n={r.n} />
-                        <div style={{ ...typeStyle('captionBold', 'desktop'), color: T.color.text }}>{r.k}</div>
-                      </div>
-                      <div style={{ ...typeStyle('caption', 'desktop'), color: T.color.textMuted }}>{r.d}</div>
-                    </div>
-                  ))}
-                </div>
-                <div style={{ maxWidth: 360, margin: '0 auto' }}>
-                  <Card
-                    eyebrow="Programs"
-                    title="Save with time-of-use rates"
-                    body="Earn credits by shifting energy use to off-peak hours."
-                    accent={T.color.yellow}
-                    footer={<a href="#" style={{ ...typeStyle('captionBold', 'desktop'), color: T.color.textLinkDeep, textDecoration: 'none' }}>Learn more →</a>}
-                  />
-                </div>
-              </Panel>
-
-              {/* ---- Variants ---- */}
-              <SectionTitle>Variants &amp; states</SectionTitle>
-              <Lead>Five accent tones × eyebrow on/off × footer on/off. Pick the accent that fits the category — leave blank for a neutral card with no left bar.</Lead>
-
-              <SubLabel mt={16}>Accent palette</SubLabel>
-              <Panel>
-                {/* Auto-fit grid — columns size to fit the panel width.
-                   Cards have a 200 px floor and wrap onto new rows as
-                   needed. minmax(0, 1fr) lets each column shrink below
-                   its content's min-width so titles wrap cleanly. */}
-                <div style={{
-                  display: 'grid',
-                  gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))',
-                  gap: 16,
-                }}>
-                  {[
-                    { k: 'none',   label: 'No accent' },
-                    { k: 'yellow', label: 'Yellow · promotional' },
-                    { k: 'green',  label: 'Green · savings' },
-                    { k: 'red',    label: 'Red · outage' },
-                    { k: 'blue',   label: 'Blue · navigation' },
-                  ].map((opt) => (
-                    <div key={opt.k} style={{ minWidth: 0 }}>
-                      <div style={{ fontSize: 11, fontWeight: 700, color: T.color.textMuted, textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 6, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{opt.label}</div>
-                      <Card
-                        eyebrow="Programs"
-                        title="Time-of-use rates"
-                        body="Earn credits by shifting use to off-peak hours."
-                        accent={ACCENTS[opt.k]}
-                      />
-                    </div>
-                  ))}
-                </div>
-              </Panel>
-
-              <SubLabel>Composition states (with / without eyebrow + footer)</SubLabel>
-              <Panel>
-                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 16 }}>
-                  <div>
-                    <div style={{ fontSize: 11, fontWeight: 700, color: T.color.textMuted, textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 6 }}>With eyebrow + footer</div>
-                    <Card
-                      eyebrow="Programs"
-                      title="Save with time-of-use rates"
-                      body="Earn credits by shifting energy use to off-peak hours."
-                      accent={T.color.yellow}
-                      footer={<a href="#" style={{ ...typeStyle('captionBold', 'desktop'), color: T.color.textLinkDeep, textDecoration: 'none' }}>Learn more →</a>}
-                    />
-                  </div>
-                  <div>
-                    <div style={{ fontSize: 11, fontWeight: 700, color: T.color.textMuted, textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 6 }}>Title + body only</div>
-                    <Card
-                      title="Save with time-of-use rates"
-                      body="Earn credits by shifting energy use to off-peak hours. Most homes save 8 to 12 percent in the first year."
-                    />
-                  </div>
-                </div>
-              </Panel>
-
-              <SectionTitle>Desktop &amp; mobile variants</SectionTitle>
-              <Lead>Type and padding scale with the viewport — title drops from H6 Desktop (24 px) to H6 Mobile (20 px); body drops 16 → 14 px; padding tightens 24 → 20 px.</Lead>
-
-              <SubLabel mt={16}>Desktop</SubLabel>
-              <Panel>
-                <div style={{ maxWidth: 360 }}>
-                  <Card
-                    eyebrow="Programs" viewport="desktop"
-                    title="Save with time-of-use rates"
-                    body="Earn credits by shifting energy use to off-peak hours."
-                    accent={T.color.yellow}
-                    footer={<a href="#" style={{ ...typeStyle('captionBold', 'desktop'), color: T.color.textLinkDeep, textDecoration: 'none' }}>Learn more →</a>}
-                  />
-                </div>
-              </Panel>
-
-              <SubLabel>Mobile</SubLabel>
-              <Panel>
-                <div style={{ maxWidth: 360, margin: '0 auto' }}>
-                  <Card
-                    eyebrow="Programs" viewport="mobile"
-                    title="Save with time-of-use rates"
-                    body="Earn credits by shifting energy use to off-peak hours."
-                    accent={T.color.yellow}
-                    footer={<a href="#" style={{ ...typeStyle('captionBold', 'mobile'), color: T.color.textLinkDeep, textDecoration: 'none' }}>Learn more →</a>}
-                  />
-                </div>
-              </Panel>
-
-              <SubLabel mt={28}>Desktop / Mobile parity</SubLabel>
-              <Panel bg={T.color.white} pad={20}>
-                <div style={{
-                  display: 'grid', gridTemplateColumns: '180px 1fr 1fr',
-                  rowGap: 10, columnGap: 16,
-                  ...typeStyle('caption', 'desktop'),
-                }}>
-                  <div style={{ fontWeight: 700, color: T.color.textMuted, fontSize: 10, textTransform: 'uppercase', letterSpacing: '0.1em' }}>Token</div>
-                  <div style={{ fontWeight: 700, color: T.color.textMuted, fontSize: 10, textTransform: 'uppercase', letterSpacing: '0.1em' }}>Desktop</div>
-                  <div style={{ fontWeight: 700, color: T.color.textMuted, fontSize: 10, textTransform: 'uppercase', letterSpacing: '0.1em' }}>Mobile</div>
-                  {[
-                    { k: 'Padding',          d: '24 px (all sides)', m: '20 px (all sides)' },
-                    { k: 'Title token',      d: 'Headline 6 Desktop · 24 / 32 / 700', m: 'Headline 6 Mobile · 20 / 28 / 700' },
-                    { k: 'Eyebrow token',    d: 'Caption Bold Desktop · 14 / 20 / 600', m: 'Caption Bold Mobile · 12 / 18 / 600' },
-                    { k: 'Body token',       d: 'Body Desktop · 16 / 24 / 400', m: 'Body Mobile · 14 / 22 / 400' },
-                    { k: 'Border radius',    d: '16 px (T.radius.md)', m: '16 px (same)' },
-                    { k: 'Accent bar width', d: '4 px',                m: '4 px (same)' },
-                    { k: 'Shadow',           d: 'T.shadow.card',       m: 'T.shadow.card (same)' },
-                  ].map((r) => (
-                    <React.Fragment key={r.k}>
-                      <div style={{ fontWeight: 700, color: T.color.text }}>{r.k}</div>
-                      <div style={{ color: T.color.text, fontFamily: 'ui-monospace, Menlo, monospace', fontSize: 11 }}>{r.d}</div>
-                      <div style={{ color: T.color.text, fontFamily: 'ui-monospace, Menlo, monospace', fontSize: 11 }}>{r.m}</div>
-                    </React.Fragment>
-                  ))}
-                </div>
-              </Panel>
-
-              {/* ---- Min/Max Width ---- */}
-              <SectionTitle>Min / Max width</SectionTitle>
-              <Lead>
-                Card stretches to <strong>100% of its parent</strong> by default. Recommended bounds: <strong>min 280 px</strong> (below this the title risks awkward wrapping), <strong>max 420 px</strong> (wider cards drift toward two-column body wrapping — promote to a Hero or Targeted Promo instead). Inside a typical 1180 px page, drop cards into a 3-up or 4-up grid.
-              </Lead>
-              <Panel>
-                <div style={{ display: 'flex', justifyContent: 'space-around', gap: 24, alignItems: 'flex-start', flexWrap: 'wrap' }}>
-                  <div style={{ width: 280 }}>
-                    <Card eyebrow="Programs" title="Save with TOU rates" body="Shift use to off-peak hours." accent={T.color.yellow} />
-                    <div style={{ textAlign: 'center', marginTop: 8, fontSize: 11, fontWeight: 700, color: T.color.white, padding: '2px 8px', borderRadius: 4, background: T.color.warn, display: 'inline-block' }}>280 min</div>
-                  </div>
-                  <div style={{ width: 420 }}>
-                    <Card eyebrow="Programs" title="Save with time-of-use rates" body="Earn credits by shifting energy use to off-peak hours. Most homes save 8 to 12 percent in the first year." accent={T.color.yellow} />
-                    <div style={{ textAlign: 'center', marginTop: 8, fontSize: 11, fontWeight: 700, color: T.color.white, padding: '2px 8px', borderRadius: 4, background: T.color.warn, display: 'inline-block' }}>420 max</div>
-                  </div>
-                </div>
-              </Panel>
-
-              {/* ---- Padding ---- */}
-              <SectionTitle>Padding</SectionTitle>
-              <Panel bg={T.color.white} pad={20}>
-                <div style={{
-                  display: 'grid', gridTemplateColumns: '200px 140px 1fr',
-                  rowGap: 10, columnGap: 16,
-                  ...typeStyle('caption', 'desktop'),
-                }}>
-                  {[
-                    { k: 'Outer padding',   v: '24 / 20 px', d: 'Desktop / mobile. Equal on all four edges.' },
-                    { k: 'Eyebrow → title', v: '8 px',       d: 'Margin-bottom on the eyebrow.' },
-                    { k: 'Title → body',    v: '8 px',       d: 'Margin-bottom on the title.' },
-                    { k: 'Body → footer',   v: '16 px',      d: 'Vertical space between the body and the footer divider rule.' },
-                    { k: 'Footer top rule', v: '1 px',       d: 'T.color.borderSoft hairline above the footer slot.' },
-                    { k: 'Footer padding',  v: '16 px top',  d: 'Padding above the footer content (link, button, etc.).' },
-                  ].map((r) => (
-                    <React.Fragment key={r.k}>
-                      <div style={{ fontWeight: 700, color: T.color.text }}>{r.k}</div>
-                      <div style={{ fontFamily: 'ui-monospace, Menlo, monospace', color: T.color.text }}>{r.v}</div>
-                      <div style={{ color: T.color.textMuted }}>{r.d}</div>
-                    </React.Fragment>
-                  ))}
-                </div>
-              </Panel>
-
-              {/* ---- Usage ---- */}
-              <SectionTitle>Usage</SectionTitle>
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
-                <Panel bg={T.color.successSoft} pad={20}>
-                  <div style={{ fontSize: 12, fontWeight: 800, color: T.color.success, textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: 8 }}>Do</div>
-                  <ul style={{ margin: 0, paddingLeft: 18, ...typeStyle('caption', 'desktop'), color: T.color.text }}>
-                    <li>Group related cards into a 3-up or 4-up grid with consistent height and accent color.</li>
-                    <li>Lead the title with a verb where possible ("Save with…", "Get…", "Apply for…").</li>
-                    <li>Use the accent bar to flag category — yellow / green / red / blue have established meanings.</li>
-                    <li>Keep the body to a single sentence on mobile; up to two on desktop.</li>
-                  </ul>
-                </Panel>
-                <Panel bg={T.color.errorSoft} pad={20}>
-                  <div style={{ fontSize: 12, fontWeight: 800, color: T.color.error, textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: 8 }}>Don't</div>
-                  <ul style={{ margin: 0, paddingLeft: 18, ...typeStyle('caption', 'desktop'), color: T.color.text }}>
-                    <li>Don't mix accent colors within a single card grid — pick one tone per row.</li>
-                    <li>Don't use the accent bar for decoration only; reserve it for categorical meaning.</li>
-                    <li>Don't stack more than three cards vertically without a Section Title breaking them up.</li>
-                    <li>Don't change the corner radius — 16 px is locked across the system.</li>
-                  </ul>
-                </Panel>
-              </div>
-
-              {/* ---- Accessibility ---- */}
-              <SectionTitle>Accessibility — WCAG 2.1 AAA (target)</SectionTitle>
-              <Lead>Card lives on a white reading surface — AAA on every text element.</Lead>
-              <Panel bg={T.color.white} pad={20}>
-                <div style={{
-                  display: 'grid', gridTemplateColumns: '200px 100px 1fr',
-                  rowGap: 10, columnGap: 16,
-                  ...typeStyle('caption', 'desktop'),
-                }}>
-                  {[
-                    { k: 'Title',            v: '18 : 1',  d: 'T.color.text on white. AAA cleared.' },
-                    { k: 'Eyebrow + body',   v: '7.05 : 1',d: 'T.color.textMuted on white. AAA cleared (just barely — keep on white only, do not place on photo).' },
-                    { k: 'Footer link',      v: '7.19 : 1',d: 'T.color.textLinkDeep on white. AAA cleared.' },
-                    { k: 'Accent bar',       v: '1.4.11',  d: 'Non-text decoration. Each accent color clears 3 : 1 against the white card surface.' },
-                    { k: 'Hairline edge',    v: '3 : 1',   d: 'T.color.border on white — WCAG 1.4.11 for non-text UI.' },
-                    { k: 'Semantics',        v: 'h4',      d: 'Title renders as <h4> so the card title is announced as a heading. Use the heading level appropriate to the page hierarchy.' },
-                  ].map((r) => (
-                    <React.Fragment key={r.k}>
-                      <div style={{ fontWeight: 700, color: T.color.text }}>{r.k}</div>
-                      <div style={{ fontFamily: 'ui-monospace, Menlo, monospace', color: T.color.green, fontWeight: 700 }}>{r.v}</div>
-                      <div style={{ color: T.color.textMuted }}>{r.d}</div>
-                    </React.Fragment>
-                  ))}
-                </div>
-              </Panel>
-
-              {/* ---- Customization ---- */}
-              <SectionTitle>Customization</SectionTitle>
-              <Lead>
-                Props: <code>eyebrow</code> (string, optional), <code>title</code> (string), <code>body</code> (string), <code>footer</code> (JSX, optional), <code>accent</code> (T.color or hex, optional), <code>viewport</code> ('desktop' | 'mobile').
-              </Lead>
-
-              {/* ---- Code ---- */}
-              <SectionTitle>Code</SectionTitle>
-              <CodeSnippet filename="Card.tsx" code={`import { Card } from '@sce/design-system';
-
-// Default — eyebrow + title + body + footer + yellow accent
-<Card
-  eyebrow="Programs"
-  title="Save with time-of-use rates"
-  body="Earn credits by shifting energy use to off-peak hours."
-  accent={T.color.yellow}
-  footer={<a href="/tou">Learn more →</a>}
-/>
-
-// Minimal — title + body only
-<Card
-  title="Save with time-of-use rates"
-  body="Earn credits by shifting energy use to off-peak hours."
-/>
-
-// Mobile viewport — smaller type + tighter padding
-<Card viewport="mobile" title="…" body="…" accent={T.color.green} />`} language="tsx" />
-
-              {/* ---- Working Example ---- */}
-              <SectionTitle>Working example</SectionTitle>
-              <Lead>Toggle every prop to see how the card composes.</Lead>
-              <Panel pad={20} bg={T.color.bgPrimary}>
-                <div style={{ display: 'grid', gridTemplateColumns: '260px 1fr', gap: 24 }}>
-                  <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
-                    <div>
-                      <SubLabel mt={0}>Viewport</SubLabel>
-                      <div style={{ display: 'inline-flex', padding: 4, gap: 4, background: T.color.bgTertiary, borderRadius: T.radius.pill }}>
-                        {['desktop', 'mobile'].map((k) => (
-                          <button key={k} type="button" onClick={() => setPgViewport(k)}
-                            style={{
-                              border: 'none', cursor: 'pointer',
-                              padding: '6px 14px', borderRadius: T.radius.pill,
-                              fontFamily: T.font.family, fontSize: 12, fontWeight: 700,
-                              background: pgViewport === k ? T.color.white : 'transparent',
-                              color:      pgViewport === k ? T.color.text  : T.color.textMuted,
-                              boxShadow:  pgViewport === k ? T.shadow.sm   : 'none',
-                              textTransform: 'capitalize',
-                            }}>{k}</button>
-                        ))}
-                      </div>
-                    </div>
-                    <div>
-                      <SubLabel mt={0}>Accent</SubLabel>
-                      <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
-                        {['none','yellow','green','red','blue'].map((k) => (
-                          <button key={k} type="button" onClick={() => setPgAccent(k)}
-                            style={{
-                              border: pgAccent === k ? `2px solid ${T.color.text}` : `1px solid ${T.color.border}`,
-                              background: T.color.white,
-                              borderRadius: T.radius.sm, cursor: 'pointer',
-                              padding: '6px 10px', fontFamily: T.font.family,
-                              fontSize: 12, fontWeight: pgAccent === k ? 700 : 500,
-                              color: T.color.text, textTransform: 'capitalize',
-                            }}>{k}</button>
-                        ))}
-                      </div>
-                    </div>
-                    <div>
-                      <SubLabel mt={0}>Options</SubLabel>
-                      <label style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 8, cursor: 'pointer' }}>
-                        <input type="checkbox" checked={pgEyebrow} onChange={(e) => setPgEyebrow(e.target.checked)} />
-                        <span style={{ ...typeStyle('caption', 'desktop'), color: T.color.text }}>Show eyebrow</span>
-                      </label>
-                      <label style={{ display: 'flex', alignItems: 'center', gap: 8, cursor: 'pointer' }}>
-                        <input type="checkbox" checked={pgFooter} onChange={(e) => setPgFooter(e.target.checked)} />
-                        <span style={{ ...typeStyle('caption', 'desktop'), color: T.color.text }}>Show footer link</span>
-                      </label>
-                    </div>
-                    <div>
-                      <SubLabel mt={0}>Title</SubLabel>
-                      <input value={pgTitle} onChange={(e) => setPgTitle(e.target.value)}
-                        style={{
-                          width: '100%', padding: 10,
-                          border: `1px solid ${T.color.border}`,
-                          borderRadius: T.radius.sm,
-                          fontFamily: T.font.family,
-                          ...typeStyle('caption', 'desktop'),
-                        }} />
-                    </div>
-                    <div>
-                      <SubLabel mt={0}>Body</SubLabel>
-                      <textarea value={pgBody} onChange={(e) => setPgBody(e.target.value)} rows={3}
-                        style={{
-                          width: '100%', padding: 10,
-                          border: `1px solid ${T.color.border}`,
-                          borderRadius: T.radius.sm,
-                          fontFamily: T.font.family,
-                          ...typeStyle('caption', 'desktop'),
-                          resize: 'vertical',
-                        }} />
-                    </div>
-                  </div>
-                  <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'center', padding: 12 }}>
-                    <div style={{
-                      width: pgViewport === 'mobile' ? 360 : 380,
-                      maxWidth: '100%',
-                    }}>
-                      <Card
-                        key={`${pgViewport}-${pgAccent}-${pgEyebrow}-${pgFooter}`}
-                        viewport={pgViewport}
-                        eyebrow={pgEyebrow ? 'Programs' : undefined}
-                        title={pgTitle}
-                        body={pgBody}
-                        accent={ACCENTS[pgAccent]}
-                        footer={pgFooter ? (
-                          <a href="#" style={{ ...typeStyle('captionBold', pgViewport), color: T.color.textLinkDeep, textDecoration: 'none' }}>Learn more →</a>
-                        ) : undefined}
-                      />
-                    </div>
-                  </div>
-                </div>
-              </Panel>
-
-              {/* ---- Source ---- */}
-              <div style={{ fontSize: T.type.caption.size, color: T.color.textSubtle, marginTop: 24, fontFamily: T.font.family }}>
-                Source: Figma file <code>gS6XoukbbNIMLDOLBUaX2u</code> · Card Container (C45). The foundation surface for grid layouts across sce.com.
-              </div>
-            </div>
-          );
-        },
-      },
       // (Removed) Alerts & Notifications (C107) — replaced by the imported
       // Alert family (Alert Panel + variants) under Feedback & Alerts.
       {
@@ -12862,10 +12275,6 @@ const LANGS = [
         },
       },
       {
-        id: 'authenticated-badge', title: 'Authenticated badge', meta: 'component canonical',
-        render: () => <AuthenticatedBadge />,
-      },
-      {
         id: 'login-modal', title: 'Login modal', meta: 'component canonical',
         render: () => {
           const [open, setOpen] = useState(false);
@@ -15155,10 +14564,6 @@ const LANGS = [
         },
       },
       {
-        id: 'program-card', title: 'Program card', meta: 'pattern',
-        render: () => <ProgramCard />,
-      },
-      {
         id: 'targeted-promo', title: 'Targeted Promo', meta: 'component canonical',
         render: () => {
           const SectionTitle = ({ children, mt = 40 }) => (
@@ -15652,10 +15057,6 @@ const LANGS = [
         },
       },
       // (Removed) Survey Block — no longer surfaced in the canonical IA.
-      {
-        id: 'bill-summary', title: 'Bill summary', meta: 'pattern animated',
-        render: () => <BillSummary />,
-      },
       {
         id: 'footer', title: 'Global Footer (C05) — Desktop', meta: 'navigation canonical',
         render: () => <FooterDesktop />,
@@ -17952,7 +17353,7 @@ const LANGS = [
   },
 ];
 
-const ANIMATED_IDS = new Set(['bill-summary']);
+const ANIMATED_IDS = new Set();
 
 /* ============================================================
    SIDEBAR  —  canonical SCE Figma sidebar hierarchy
@@ -18039,7 +17440,6 @@ const SIDEBAR = [
           { id: 'step-indicator',     label: 'Step Indicators' },
           { id: 'tabs',               label: 'Tabs' },
           { id: 'quick-actions-bar',  label: 'Quick Actions Bar (C08)' },
-          { id: 'imp-cards-c08',      label: 'C08 Quick Actions Bar — legacy', child: true },
           { id: 'read-more-link',     label: 'Read More Link' },
           { id: 'external-link',      label: 'External Link' },
         ],
@@ -18060,16 +17460,12 @@ const SIDEBAR = [
       {
         name: 'Display & Containers',
         items: [
-          { id: 'card',           label: 'Card Container (C45)' },
           { id: 'featured-card',  label: 'Content Card (C24, 24A, 24B)' },
           { id: 'imp-cards-c24c', label: 'Content Card — C24c' },
           { id: 'imp-cards-c24d', label: 'Content Card — C24d' },
           { id: 'imp-cards-c24e', label: 'Content Card — C24e' },
-          { id: 'program-card',   label: 'Program Card' },
-          { id: 'bill-summary',   label: 'Bill Summary' },
           { id: 'table',          label: 'Tables' },
           { id: 'status',         label: 'Status Labels' },
-          { id: 'authenticated-badge', label: 'Authenticated Badge' },
           { id: 'avatar-circle',  label: 'Avatar' },
           { id: 'placeholder-img',label: 'Placeholder Image' },
           { id: 'divider',        label: 'Divider' },
@@ -18206,7 +17602,6 @@ function ComponentCard({ item, focused, animKey, viewport }) {
     // Dashboard home page — full-bleed hero + grid layout
     item.id === 'dashboard' ||
     // Bucket-1 canonical doc pages — full template needs full canvas
-    item.id === 'card' ||                /* Card Container (C45) */
     item.id === 'featured-card' ||       /* Content Card (C24/24A/24B) */
     item.id === 'copy-block' ||          /* Copy Block (C22) */
     item.id === 'help-center' ||         /* Help Center (C50) */
@@ -18216,7 +17611,7 @@ function ComponentCard({ item, focused, animKey, viewport }) {
     item.id === 'sticky-block' ||        /* Sticky CTA Block (C42) */
     item.id === 'hero' ||                /* Hero Page Header (C20/C20A) */
     item.id === 'quick-actions-bar' ||   /* Quick Actions Bar (C08) — native canonical */
-    // Imported legacy stories (Alerts, Buttons, Cards, C08 Quick Actions)
+    // Imported legacy stories (Alerts, Buttons, Cards)
     item.id.startsWith('imp-') ||
     // Global header is canonical 1440px — all states render at full width
     (item.id.startsWith('global-header') &&
