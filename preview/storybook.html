@@ -7081,6 +7081,18 @@ function LegacyStory({ storyId, badge, title, description, canonicalAlternative 
  * --------------------------------------------------------------------- */
 const CHANGELOG = [
   {
+    version: '0.8',
+    date: 'May 22, 2026',
+    entries: [
+      { tone: 'New',    text: 'New <strong>Art Direction</strong> foundation page (Brand &amp; Identity). Image-selection guidelines (tone &amp; mood, color, representation, infrastructure, employee imagery), header rules (close-up / POV usage, generative-AI extension prompts, gradient headers), plus per-content-area mood boards. 26 reference slides exported to <code>assets/images/art-direction/</code>.' },
+      { tone: 'A11y',   text: 'Form controls unified on blue. <strong>Radio</strong> and <strong>Toggle</strong> selected / on states now use <code>T.color.textLinkDeep</code> (#0e58a0), matching Checkbox so all form controls share one accent.' },
+      { tone: 'Change', text: 'Retired components: <strong>Card Container (C45)</strong>, <strong>Program Card</strong>, <strong>Bill Summary</strong>, <strong>Authenticated Badge</strong>, and the <strong>Outage Banner</strong>. Also dropped the legacy C08 Quick Actions Bar imported story (native canonical kept). Pruned from the storybook, <code>components/index.js</code>, COMPONENT-INDEX, BUILD-PLAN, and the .jsx mirrors.' },
+      { tone: 'Fix',    text: 'Mobile Global Header working example switched from hover to click (tap the menu icon for the content drawer, tap the avatar for self-service). Close button now vertically centers with the menu button.' },
+      { tone: 'Fix',    text: 'Help Center mobile preview renders at true 393px width. CCA info-card headers fill white. Quick Actions Bar wraps the <strong>Payment Assistance</strong> label onto two lines on mobile instead of clipping it.' },
+      { tone: 'Change', text: 'Version chip is now data-driven. The header badge, Dashboard <strong>Current Version</strong> tile, and this changelog all read from <code>CHANGELOG[0]</code>, so a single entry keeps every version display in sync.' },
+    ],
+  },
+  {
     version: '0.7',
     date: 'May 16, 2026',
     entries: [
@@ -7587,6 +7599,321 @@ const SECTIONS = [
             ))}
           </div>
         ),
+      },
+      {
+        /* Art Direction - image selection guidelines for SCE.com.
+         * Mirrors the "SCE.com Image Art Direction & Guidelines" deck:
+         * the written rules (tone/mood, color, representation, infra,
+         * employees, header usage, generative-AI extension, gradient
+         * headers) are authored as crisp text here; the per-category
+         * style-reference mood boards are embedded as page exports from
+         * assets/images/art-direction/ (local-relative per CLAUDE.md). */
+        id: 'art-direction', title: 'Art Direction', meta: 'foundation',
+        render: () => {
+          const AD = '../assets/images/art-direction/';
+          const sectionH = {
+            fontSize: T.type.h3.size, fontWeight: T.type.h3.weight,
+            color: T.color.text, letterSpacing: '-0.01em',
+            marginTop: 36, marginBottom: 6, fontFamily: T.font.family,
+          };
+          const lead = {
+            fontSize: T.type.body.size, color: T.color.textMuted,
+            lineHeight: T.type.body.line + 'px', marginBottom: 18,
+            maxWidth: 760, fontFamily: T.font.family,
+          };
+          const overline = {
+            fontSize: T.type.overline.size, fontWeight: 700,
+            color: T.color.textMuted, textTransform: 'uppercase',
+            letterSpacing: '0.1em', marginTop: 28, marginBottom: 12,
+            fontFamily: T.font.family,
+          };
+          // A single embedded reference slide with a caption underneath.
+          const Figure = ({ src, caption }) => (
+            <figure style={{ margin: 0 }}>
+              <img
+                src={AD + src}
+                alt={caption || 'SCE art direction reference'}
+                loading="lazy"
+                style={{
+                  width: '100%', display: 'block',
+                  borderRadius: T.radius.sm,
+                  border: `1px solid ${T.color.borderSoft}`,
+                  background: T.color.heather,
+                }}
+              />
+              {caption && (
+                <figcaption style={{
+                  marginTop: 8, fontSize: T.type.caption.size,
+                  color: T.color.textMuted, fontFamily: T.font.family,
+                }}>{caption}</figcaption>
+              )}
+            </figure>
+          );
+          // Responsive gallery of reference slides for one content area.
+          const Gallery = ({ children }) => (
+            <div style={{
+              display: 'grid',
+              gridTemplateColumns: 'repeat(auto-fit, minmax(360px, 1fr))',
+              gap: 20, marginTop: 4,
+            }}>{children}</div>
+          );
+          // One of the five general-guideline pillars (heading + bullets).
+          const Pillar = ({ title, points }) => (
+            <div style={{
+              padding: 18, borderRadius: T.radius.sm,
+              background: T.color.white,
+              border: `1px solid ${T.color.borderSoft}`,
+              fontFamily: T.font.family,
+            }}>
+              <div style={{
+                fontSize: T.type.caption.size, fontWeight: 800,
+                color: T.color.text, marginBottom: 10,
+                letterSpacing: '-0.01em',
+              }}>{title}</div>
+              <ul style={{
+                margin: 0, paddingLeft: 18,
+                fontSize: T.type.caption.size, color: T.color.textMuted,
+                lineHeight: '20px',
+              }}>
+                {points.map((p, i) => (
+                  <li key={i} style={{ marginBottom: 6 }}>{p}</li>
+                ))}
+              </ul>
+            </div>
+          );
+          // Do / Don't rule chip used in the header-usage section.
+          const Rule = ({ kind, label }) => {
+            const ok = kind === 'do';
+            return (
+              <span style={{
+                display: 'inline-flex', alignItems: 'center', gap: 6,
+                padding: '4px 12px', borderRadius: T.radius.pill,
+                fontSize: T.type.caption.size, fontWeight: 700,
+                fontFamily: T.font.family,
+                color: ok ? T.color.success : T.color.error,
+                background: ok ? T.color.successSoft : T.color.errorSoft,
+                border: `1px solid ${ok ? T.color.success : T.color.error}`,
+              }}>{ok ? '✓' : '✕'} {label}</span>
+            );
+          };
+          const promptBox = {
+            fontFamily: 'ui-monospace, SFMono-Regular, Menlo, monospace',
+            fontSize: 12, lineHeight: 1.5, color: T.color.text,
+            background: T.color.heather, border: `1px solid ${T.color.borderSoft}`,
+            borderRadius: T.radius.sm, padding: '12px 14px',
+          };
+
+          return (
+            <div className="stack" style={{ fontFamily: T.font.family }}>
+              <div style={lead}>
+                How photography and header imagery are selected, composed, and
+                extended across SCE.com. These guidelines mirror the SCE.com
+                Image Art Direction deck - pair them with the Color and
+                Typography foundations whenever you place text over an image.
+              </div>
+
+              <div style={{
+                padding: '12px 16px', background: T.color.successSoft,
+                border: `1px solid ${T.color.success}`,
+                borderRadius: T.radius.sm,
+                fontSize: T.type.caption.size, color: T.color.text,
+                lineHeight: '20px', fontFamily: T.font.family,
+              }}>
+                <strong>Wildfire-sensitive palette -</strong> avoid colors that
+                read as fire or wildfire (intense reds, oranges, smoky hues, and
+                over-saturated sunsets). Blue skies should be fully saturated for
+                clarity. This applies to every content area below.
+              </div>
+
+              {/* ----- General guidelines (deck page 2) ----- */}
+              <h3 style={sectionH}>General image guidelines</h3>
+              <div style={lead}>
+                Every image, regardless of content area, should hold to these
+                five pillars before it ships.
+              </div>
+              <div style={{
+                display: 'grid',
+                gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))',
+                gap: 16,
+              }}>
+                <Pillar title={'Tone & Mood'} points={[
+                  'Bright, natural lighting',
+                  'Approachable, authentic emotions',
+                  'Real-world, relatable scenarios',
+                  'Balanced, uncluttered framing',
+                  'Depth of field to highlight key subjects',
+                ]} />
+                <Pillar title={'Color & Composition'} points={[
+                  'Use vibrant colors strategically',
+                  'Warm, inviting tones for everyday topics',
+                  'For serious topics, avoid over-saturation and overly cheerful imagery',
+                  'Blue skies fully saturated for clarity',
+                  'Avoid fire / wildfire colors - intense reds, oranges, yellow sunsets',
+                ]} />
+                <Pillar title={'Representation & Authenticity'} points={[
+                  'Diverse, everyday people across ages and backgrounds',
+                  'Varied living situations - multi-generational, renters, working professionals',
+                  'Urban, suburban, and rural settings',
+                  'Avoid stereotypes, overused stock, or one-demographic reliance',
+                ]} />
+                <Pillar title={'Infrastructure & Branding'} points={[
+                  'Verify infrastructure is within SCE’s service area',
+                  'Remove or blur non-SCE branding from objects and vehicles',
+                ]} />
+                <Pillar title="Employee Imagery" points={[
+                  'Feature only employees in good standing',
+                  'Approval may be required - Corporate Safety (field work), HR or Ethics (vetting)',
+                ]} />
+              </div>
+
+              {/* ----- Header usage: close-up / POV (deck page 3) ----- */}
+              <h3 style={sectionH}>Close-up &amp; POV imagery</h3>
+              <div style={lead}>
+                Close-up or point-of-view shots of bills, screens, and documents
+                feel out of place in a header and fail to establish a strong
+                visual introduction. Reserve them for the body of a page, where
+                they give context for billing, payments, or account management.
+              </div>
+              <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap', marginBottom: 14 }}>
+                <Rule kind="dont" label="Bills / screens / documents as headers" />
+                <Rule kind="do" label={'POV bill & screen shots in the page body'} />
+              </div>
+              <Figure src="03-pov-usage.jpg" caption="A POV bill crop is wrong for a header (left) but right inline, where it supports a billing or account topic." />
+
+              {/* ----- Generative-AI extension (deck pages 4-5) ----- */}
+              <h3 style={sectionH}>Generative-AI image extension</h3>
+              <div style={lead}>
+                Wide header slots often need an image extended beyond its
+                original frame. Done well, extension preserves context that a
+                hard crop would lose - power lines above a scene, for example.
+                Use a blurred soft-focus foreground to add depth, and keep added
+                elements realistic and cohesive. Avoid extensions that distort
+                objects, introduce artifacts, or break the authenticity of the
+                scene.
+              </div>
+              <Gallery>
+                <Figure src="04-image-extension.jpg" caption="Hard crop vs. AI extension - extension keeps the power lines and the intended message intact." />
+                <Figure src="05-image-extension-2.jpg" caption="Approved extension style: an out-of-focus foreground element for a natural, immersive look." />
+              </Gallery>
+              <div style={{
+                display: 'grid',
+                gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))',
+                gap: 14, marginTop: 16,
+              }}>
+                <div>
+                  <div style={overline}>Interior extension prompt</div>
+                  <div style={promptBox}>Blurred soft-focus foreground object, slightly out of focus, warm indoor lighting, maintaining color harmony with existing scene, cinematic depth of field.</div>
+                </div>
+                <div>
+                  <div style={overline}>Exterior extension prompt</div>
+                  <div style={promptBox}>Soft blurred foreground, warm outdoor lighting, subtle depth of field, integrating natural elements like {'{plants, buildings, or sky}'}, seamless transition with existing environment.</div>
+                </div>
+              </div>
+
+              {/* ----- Gradient headers (deck page 6) ----- */}
+              <h3 style={sectionH}>Gradient header images</h3>
+              <div style={lead}>
+                Not every page needs a photograph. L4 pages can use a clean color
+                gradient instead - just keep it accessible and readable. A subtle
+                photo may be blended into a mostly-color gradient to add depth
+                while staying clean and minimal.
+              </div>
+              <Figure src="06-gradient-headers.jpg" caption="Solid-to-color gradient header treatments, with an optional light photo blend in the last example." />
+
+              {/* ----- Style reference by content area (deck pages 7-28) ----- */}
+              <h3 style={sectionH}>Style reference by content area</h3>
+              <div style={lead}>
+                Each SCE.com content area has a distinct photographic direction.
+                Use these mood boards as the reference when sourcing or
+                commissioning imagery for a given section.
+              </div>
+
+              <div style={overline}>My Account</div>
+              <div style={lead}>
+                Atmospheric, abstract, or textural landscape photography; soft
+                gradients, blurred backgrounds, subtle lighting; clean
+                infrastructure shots. Avoid close-ups of people (the narrow
+                header leaves no room), busy or cluttered environments, and any
+                fire-adjacent color tones.
+              </div>
+              <Gallery>
+                <Figure src="07-my-account.jpg" caption="My Account - preferred vs. avoid header styles." />
+              </Gallery>
+
+              <div style={overline}>Outages &amp; Safety</div>
+              <div style={lead}>
+                Lineworkers at work and in customer interactions; general,
+                balloon, digging, and tree-trimming safety scenarios. Keep crews
+                authentic and the framing focused on the safety message.
+              </div>
+              <Gallery>
+                <Figure src="08-outages-lineworkers-1.jpg" caption="Lineworkers - style reference." />
+                <Figure src="09-outages-lineworkers-2.jpg" caption="Lineworkers - style reference." />
+                <Figure src="10-outages-lineworkers-customer.jpg" caption="Lineworkers - customer interactions." />
+                <Figure src="11-safety-balloon-digging.jpg" caption="General safety - balloon and digging safety." />
+                <Figure src="12-safety-tree-trimming.jpg" caption="Tree-trimming safety." />
+              </Gallery>
+
+              <div style={overline}>Wildfire &amp; PSPS</div>
+              <div style={lead}>
+                Community outreach and weather-station infrastructure. Hold to
+                the wildfire-sensitive palette - no fire-colored skies or smoke.
+              </div>
+              <Gallery>
+                <Figure src="13-wildfire-psps.jpg" caption={'Wildfire & PSPS - community outreach and weather stations.'} />
+              </Gallery>
+
+              <div style={overline}>Clean Energy &amp; Efficiency</div>
+              <div style={lead}>
+                Green infrastructure, large-scale and residential batteries,
+                solar (utility and residential), and home electrification. Bright,
+                optimistic, and clearly within SCE’s service area.
+              </div>
+              <Gallery>
+                <Figure src="14-clean-energy-infrastructure.jpg" caption="Green infrastructure." />
+                <Figure src="15-clean-energy-batteries.jpg" caption="Batteries - large scale." />
+                <Figure src="16-solar-panels-1.jpg" caption="Solar panels." />
+                <Figure src="17-solar-panels-residential.jpg" caption="Solar - residential." />
+                <Figure src="18-electrification-residential.jpg" caption="Electrification - residential." />
+                <Figure src="19-home-batteries.jpg" caption="Home batteries - residential." />
+              </Gallery>
+
+              <div style={overline}>Save Money</div>
+              <div style={lead}>
+                Customers at home, AFN / MBL (access &amp; functional needs,
+                medical baseline) audiences, and EV customers. Warm, relatable,
+                everyday scenarios across diverse households.
+              </div>
+              <Gallery>
+                <Figure src="20-save-money-home-1.jpg" caption="Customers at home." />
+                <Figure src="21-save-money-home-2.jpg" caption="Customers at home." />
+                <Figure src="22-save-money-home-3.jpg" caption="Customers at home." />
+                <Figure src="23-save-money-afn-mbl.jpg" caption="AFN / MBL audiences." />
+                <Figure src="24-save-money-ev.jpg" caption="EV customers." />
+              </Gallery>
+
+              <div style={overline}>For Business</div>
+              <div style={lead}>
+                Small-business and commercial settings - professional, credible,
+                and grounded in real workplaces.
+              </div>
+              <Gallery>
+                <Figure src="25-for-business.jpg" caption="Small business / business - style reference." />
+              </Gallery>
+
+              <div style={overline}>About SCE</div>
+              <div style={lead}>
+                Corporate and community-facing imagery for the About section -
+                people, place, and infrastructure that convey trust.
+              </div>
+              <Gallery>
+                <Figure src="26-about-sce-1.jpg" caption="About Us - style reference." />
+                <Figure src="27-about-sce-2.jpg" caption="About Us - style reference." />
+                <Figure src="28-about-sce-3.jpg" caption="About Us - style reference." />
+              </Gallery>
+            </div>
+          );
+        },
       },
       {
         id: 'typography', title: 'Typography', meta: 'foundation canonical',
@@ -17403,8 +17730,9 @@ const SIDEBAR = [
       {
         name: 'Brand & Identity',
         items: [
-          { id: 'edison-brand', label: 'Logos' },
-          { id: 'icons',        label: 'Iconography' },
+          { id: 'edison-brand',  label: 'Logos' },
+          { id: 'icons',         label: 'Iconography' },
+          { id: 'art-direction', label: 'Art Direction' },
         ],
       },
       {
@@ -17567,6 +17895,7 @@ function ComponentCard({ item, focused, animKey, viewport }) {
     item.id === 'typography' ||
     item.id === 'icons' ||
     item.id === 'edison-brand' ||
+    item.id === 'art-direction' ||
     item.id === 'forms-principles' ||
     item.id === 'pagination' ||
     item.id === 'breadcrumb' ||
@@ -17810,7 +18139,7 @@ function App() {
         </button>
         <span className="ds-header__appname">Design System</span>
         <div className="ds-header__spacer" />
-        <span className="ds-header__version">v0.5 · ALPHA</span>
+        <span className="ds-header__version">v{CHANGELOG[0].version} · ALPHA</span>
       </header>
 
       <div className="ds-layout">
