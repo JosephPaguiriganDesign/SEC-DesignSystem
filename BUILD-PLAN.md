@@ -40,6 +40,10 @@ Roadmap for the SCE.com Design System repo.
 - [ ] Dark theme — sce.com tokens.css supports `[data-eix-theme=dark]`. Mirror it into `T.themes.dark` in tokens.js
 - [ ] Outage map / locator (sce.com loads it on `/outages-safety/outage-center` — out of scope until that page is ready to QA)
 
+## Parked (revisit after landing pages)
+
+- [ ] Imported legacy card entries (`imp-cards-c24d` / `imp-cards-c24e`, and likely `imp-cards-c24b` / `imp-cards-c24c`) reference CSS classes (`.c24d-card__scrim`, etc.) that have no stylesheet anywhere, so the imported previews render unstyled. The native navy `ContentCardC24d` / `C24e` now supersede them. Decide: retire the imported C24d/C24e entries (recommended), retire all four, or author a navy-scrim stylesheet so the previews render and match. Native photo-overlay components (HeroBanner, FeaturedCard, cards) already use the hero navy scrim, so no change is needed there.
+
 ## Phasing
 
 **Phase 1 — Foundations + atoms (current).** Tokens, icons, primitive form + display components, plus the small handful of SCE-specific patterns visible on the homepage.

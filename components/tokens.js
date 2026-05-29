@@ -66,6 +66,7 @@ export const color = {
   textSubtle:   '#707372',
   textDisabled: 'rgba(83, 86, 90, 0.6)',
   textLink:     '#1a76c5',
+  textLinkOnGray: '#0d4f8f', // 7.61 : 1 on gray-100 (#f5f5f5) — AAA. Use for links on the footer / gray reading surfaces where textLink (4.34 : 1) fails.
   textWhite:    '#ffffff',
 };
 
